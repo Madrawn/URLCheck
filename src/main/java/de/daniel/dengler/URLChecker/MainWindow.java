@@ -1,29 +1,27 @@
 package de.daniel.dengler.URLChecker;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.text.DefaultCaret;
 
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
-
-import javax.swing.Box;
-
-import java.awt.Dimension;
-
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
 
 public class MainWindow {
 	
@@ -133,7 +131,10 @@ public class MainWindow {
 		txtrAnleitungcsv = new JTextArea();
 		txtrAnleitungcsv.setLineWrap(true);
 		txtrAnleitungcsv.setEditable(false);
+		DefaultCaret caret = (DefaultCaret)txtrAnleitungcsv.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		txtrAnleitungcsv.setText("Anleitung:\r\n1. *.csv Datei auswählen\r\n2. Die relevante Spalte mit den zu überprüfenden URLs angeben (0 ist die erste Spalte)\r\n3. Check-Button klicken\r\n4. Wenn alle URLs überprüft wurden über Export das Ergebniss als *.csv exportieren.");
+		
 		scrollPane.setViewportView(txtrAnleitungcsv);
 		
 		Component rigidArea_1 = Box.createRigidArea(new Dimension(20, 20));
