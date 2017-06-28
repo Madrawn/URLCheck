@@ -1,10 +1,10 @@
 package de.daniel.dengler.URLChecker;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFileChooser;
@@ -17,10 +17,10 @@ public class Helper {
 		List<String> lines;
 		try {
 			Path path2 = Paths.get(path);
-			
+			//This is better
+			lines = Files.readAllLines(path2,StandardCharsets.ISO_8859_1);
 			//read all bytes avoids charset problems by using system default charset and replacing invalid byte sequences
-			//lines = Files.readAllLines(path2);
-			lines = Arrays.asList((new String(Files.readAllBytes(path2))).split("\n"));
+			//lines = Arrays.asList((new String(Files.readAllBytes(path2))).split("\n"));
 		} catch (IOException e) {
 			e.printStackTrace();
 			
