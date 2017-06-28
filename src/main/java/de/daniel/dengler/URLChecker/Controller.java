@@ -57,7 +57,7 @@ public class Controller implements Runnable{
 			
 			
 			//begin checking
-			jta.append("\n \n Checking URLs \n Wenn keine URLs hier ausgegeben werden, haben sie vermutlich die falsche Spalte gewählt oder die URL sind anderweitig nicht lesbar.");
+			jta.append("\n \n Checking URLs");
 			for (int i = 0; i < table.length; i++) {
 				//check every url and generate the export table
 				String e = table[i][mainWindow.getRelevantColumn()];
@@ -70,8 +70,11 @@ public class Controller implements Runnable{
 					jta.append("\n" + e);
 					pb.setValue(i+1);
 				} catch (MalformedURLException e1) {
+					jta.append("\n"+e+" ist keine korrekte URL");
 					e1.printStackTrace();
 				} catch (IOException e1) {
+					jta.append("\n"+e+" <-> URL <-> IOException");
+					
 					e1.printStackTrace();
 				}
 
