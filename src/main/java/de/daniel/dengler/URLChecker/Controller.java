@@ -54,10 +54,17 @@ public class Controller implements Runnable{
 			JProgressBar pb = mainWindow.getProgressBar();
 			pb.setMaximum(lines.size());
 			
+			//We assume the file has titles in the first row. copy them to the right of the new table titles
+			String[] originalTitles = table[0];
+			for (int i = 0; i < originalTitles.length; i++) {
+				title.add(originalTitles[i]);
+			}
+			
 			
 			//begin checking
 			jta.append("\n \n Checking URLs");
-			for (int i = 0; i < table.length; i++) {
+			//skip titles, start at 1
+			for (int i = 1; i < table.length; i++) {
 				//check every url and generate the export table
 				String e = table[i][mainWindow.getRelevantColumn()];
 				UrlChecker urlChecker;
@@ -65,7 +72,7 @@ public class Controller implements Runnable{
 					urlChecker = new UrlChecker(new URL(e));
 					workingTable.add(addLine(urlChecker.getStartURL(),
 							urlChecker.getMatches(), urlChecker.getNewUrl(),
-							urlChecker.getGuessedCorrectUrl()));
+							urlChecker.getGuessedCorrectUrl(),table[i]));
 					jta.append("\n" + e);
 					pb.setValue(i+1);
 				} catch (MalformedURLException e1) {
@@ -123,12 +130,15 @@ public class Controller implements Runnable{
 
 	//helper method for generating a line as a list
 	private List<String> addLine(String startURL, boolean matches,
-			String newUrl, String guessedCorrectUrl) {
+			String newUrl, String guessedCorrectUrl, String[] rest) {
 		List<String> line = new LinkedList<String>();
 		line.add(startURL);
 		line.add("" + matches);
 		line.add(newUrl);
 		line.add(guessedCorrectUrl);
+		for (int i = 0; i < rest.length; i++) {
+			line.add(rest[i]);
+		}
 		return line;
 	}
 
