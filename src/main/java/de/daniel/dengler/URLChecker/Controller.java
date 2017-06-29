@@ -49,7 +49,10 @@ public class Controller implements Runnable {
 		JTextArea jta = mainWindow.getTextArea();
 		// get the lines from the file
 		List<String> lines = Helper.readFile(selectedFile.getAbsolutePath());
-		if (!lines.isEmpty()) {
+		
+		
+		
+		if (lines != null && !lines.isEmpty()) {
 			String[][] table = CsvWrapper.readCsv(lines);
 
 			jta.append("\n .csv-Datei erfolgreich eingelesen mit "
@@ -57,12 +60,12 @@ public class Controller implements Runnable {
 			JProgressBar pb = mainWindow.getProgressBar();
 			pb.setMaximum(lines.size());
 			
-			//Only one column might be an error notifiy
+			//Only one column might be an error notify
 			if (table[1].length == 1) {
-				jta.append("\n \n Die CSV hat nur eine einzige Spalte.");
+				jta.append("\n \n Die CSV hat nur eine einzige Spalte. Potenziell falscher Trenner.");
 			}
 			
-			//This is definitly an error.
+			//This is definitely an error.
 			if (table[1].length < mainWindow.getRelevantColumn() +1) {
 				jta.append("\n \n Sie haben die "
 						+ (mainWindow.getRelevantColumn() +1)
@@ -70,7 +73,7 @@ public class Controller implements Runnable {
 						+ " hat jedoch nur "
 						+ table[1].length
 						+ " Spalte\\n\n"
-						+ "Vielleich wurde die CSV mit dem falschen Trenner exportiert?");
+						+ "Vielleich wurde die CSV mit dem falschen Trenner exportiert?(Trenner muss ein ',' (Komma) sein.)");
 				return;
 
 			}
