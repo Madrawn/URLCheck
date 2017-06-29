@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class UrlChecker {
+public class UrlChecker implements Comparable<UrlChecker>{
 	
 	private URL toCheck;
 	private String responseCode = "not set";
@@ -83,6 +83,11 @@ public class UrlChecker {
 
 	public boolean getMatches() {
 		return !isRedirected();
+	}
+
+	public int compareTo(UrlChecker o) {
+		
+		return this.getStartURL().compareTo(o.getStartURL());
 	}
 
 }

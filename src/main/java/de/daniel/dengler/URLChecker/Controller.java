@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
 import javax.swing.JProgressBar;
@@ -18,6 +20,7 @@ public class Controller implements Runnable{
 	private MainWindow mainWindow;
 	private List<List<String>> workingTable = new LinkedList<List<String>>();
 	private List<String> title = new LinkedList<String>();
+	private Collection<UrlChecker> alreadyCheckedUrls = new TreeSet<UrlChecker>();
 
 	public Controller(MainWindow me) {
 		this.mainWindow = me;
@@ -67,12 +70,26 @@ public class Controller implements Runnable{
 			for (int i = 1; i < table.length; i++) {
 				//check every url and generate the export table
 				String e = table[i][mainWindow.getRelevantColumn()];
-				UrlChecker urlChecker;
+				UrlChecker urlChecker = null;
+				
+				//if we already checked then we don't need to again saving a lot of time
+				boolean alreadyChecked = false;
+				for(UrlChecker u : alreadyCheckedUrls){
+					if(u.getStartURL().equals(e)){
+						alreadyChecked = true;
+						urlChecker = u;
+					}
+				}
+				
 				try {
-					urlChecker = new UrlChecker(new URL(e));
-					workingTable.add(addLine(urlChecker.getStartURL(),
+					if(!alreadyChecked){
+						urlChecker = new UrlChecker(new URL(e));
+					}
+					List<String> checkedLine = addLine(urlChecker.getStartURL(),
 							urlChecker.getMatches(), urlChecker.getNewUrl(),
-							urlChecker.getGuessedCorrectUrl(),table[i]));
+							urlChecker.getGuessedCorrectUrl(),table[i]);
+					workingTable.add(checkedLine);
+					alreadyCheckedUrls.add(urlChecker);
 					jta.append("\n" + e);
 					pb.setValue(i+1);
 				} catch (MalformedURLException e1) {
