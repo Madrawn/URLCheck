@@ -24,6 +24,12 @@ public class Controller implements Runnable {
 
 	public Controller(MainWindow me) {
 		this.mainWindow = me;
+		// This is the first row with the titles of each column
+		title.add("Start URL");
+		title.add("Matches");
+		title.add("End URL");
+		title.add("Korrekte URL");
+		workingTable.add(title);
 	}
 
 	public void run() {
@@ -33,12 +39,6 @@ public class Controller implements Runnable {
 	public void setFile(File selectedFile) {
 		this.selectedFile = selectedFile;
 
-		// This is the first row with the titles of each column
-		title.add("Start URL");
-		title.add("Matches");
-		title.add("End URL");
-		title.add("Korrekte URL");
-		workingTable.add(title);
 
 	}
 
