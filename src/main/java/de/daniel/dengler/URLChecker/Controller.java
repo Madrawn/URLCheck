@@ -14,6 +14,7 @@ public class Controller implements Runnable {
 	private MainWindow mainWindow;
 	private List<List<String>> workingTable = new LinkedList<List<String>>();
 	private List<String> title = new LinkedList<String>();
+	private Connector conn = new Connector();
 	
 
 	public Controller(MainWindow me) {
@@ -47,7 +48,7 @@ public class Controller implements Runnable {
 		mainWindow.setCheckButtonEnabled(false);
 		
 		
-		Helper.processLines(this, relevantColumn, lines);
+		Helper.processLines(this, relevantColumn, lines, conn);
 	}
 
 	

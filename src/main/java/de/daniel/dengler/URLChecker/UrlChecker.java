@@ -11,21 +11,23 @@ public class UrlChecker implements Comparable<UrlChecker>{
 	private String newURL = "not set";
 	private String guessedURL = "not set / start and finish url match";
 	private boolean redirected;
-	public UrlChecker(URL toCheck) throws IOException{
+	private Connector c;
+	
+	public UrlChecker(URL toCheck, Connector c) throws IOException{
 		this.toCheck = toCheck;
+		this.c = c;
 		checkIt();		
 	}
 
 	private void checkIt() throws IOException {
-		HttpURLConnection con = (HttpURLConnection) toCheck.openConnection();
-		
+		c.openConnection(toCheck);
 		//connection automatically redirects
 		//con.setInstanceFollowRedirects(false);
-		con.connect();
-		responseCode = String.valueOf(con.getResponseCode());
+		c.connect();
+		responseCode = String.valueOf(c.getResponseCode());
 		
-		newURL = con.getURL().toString();
-		System.out.println(con.getHeaderFields().toString());
+		newURL = c.getURL().toString();
+		System.out.println(c.getHeaderFields().toString());
 		redirected = !newURL.equals(toCheck.toString());
 		if(redirected){
 			
@@ -39,7 +41,7 @@ public class UrlChecker implements Comparable<UrlChecker>{
 			//now check the base url with _1 up to _9
 			 for(int i = 1; i < 10; i++){
 				 String urlToTry = baseURL + "_" + i;
-				 HttpURLConnection c = (HttpURLConnection) new URL(urlToTry).openConnection();
+				 c.openConnection(new URL(urlToTry));
 				 //don't follow redirects
 				 c.setInstanceFollowRedirects(false);
 				 c.connect();
@@ -50,10 +52,10 @@ public class UrlChecker implements Comparable<UrlChecker>{
 				 if(response == 200){
 					 guessedURL = urlToTry;
 				 }
-				 c.disconnect();
 				 
 			 }
 		}
+		c.disconnect();
 	}
 
 	public String getStatus() {

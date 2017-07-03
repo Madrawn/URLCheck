@@ -7,10 +7,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UrlCheckerTest {
 
+	Connector conn = new ConnectorMock();
 	
 	@Before
 	public void setUp(){
@@ -22,7 +24,8 @@ public class UrlCheckerTest {
 	}
 	
 
-	
+	//live test
+	@Ignore("Uses a live connection")
 	@Test
 	public void testCorruptBlankeUrl() throws IOException {
 		//This is the currently live link
@@ -34,7 +37,8 @@ public class UrlCheckerTest {
 		System.out.println(start);
 		URL url = new URL(start); 
 		
-		UrlChecker checker = new UrlChecker(url); 
+		
+		UrlChecker checker = new UrlChecker(url, new Connector()); 
 		collect(checker);
 		
 		assertTrue(checker.isRedirected() == true);
@@ -52,7 +56,7 @@ public class UrlCheckerTest {
 		System.out.println(start);
 		URL url = new URL(start); 
 		
-		UrlChecker checker = new UrlChecker(url); 
+		UrlChecker checker = new UrlChecker(url, conn); 
 		collect(checker);
 		
 		assertTrue(checker.getStartURL().equals(checker.getNewUrl()));

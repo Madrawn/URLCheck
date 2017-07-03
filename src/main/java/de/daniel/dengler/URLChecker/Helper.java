@@ -50,16 +50,9 @@ public class Helper {
 
 	}
 	
-	/**
-	 * @param c
-	 * @param mainWin
-	 * @param relevantColumn
-	 * @param checkedUrls
-	 * @param tableTitle
-	 * @param lines
-	 */
+
 	protected static void processLines(Controller c,
-			int relevantColumn, List<String> lines) {
+			int relevantColumn, List<String> lines, Connector conn) {
 		
 		Collection<UrlChecker> alreadyCheckedUrls = new TreeSet<UrlChecker>();
 		
@@ -70,6 +63,12 @@ public class Helper {
 					+ lines.size() + " Zeilen");
 			c.setProgressMaximum(lines.size());
 			
+			// We assume the file has titles in the first row. copy them to the
+			// right of the new table titles
+			String[] originalTitles = table[0];
+			for (int i = 0; i < originalTitles.length; i++) {
+				c.getTitle().add(originalTitles[i]);
+			}
 			//Only one column might be an error notify
 			if (table[1].length == 1) {
 				c.append("\n \n Die CSV hat nur eine einzige Spalte. Potenziell falscher Trenner.");
@@ -88,12 +87,6 @@ public class Helper {
 
 			}
 
-			// We assume the file has titles in the first row. copy them to the
-			// right of the new table titles
-			String[] originalTitles = table[0];
-			for (int i = 0; i < originalTitles.length; i++) {
-				c.getTitle().add(originalTitles[i]);
-			}
 
 			// begin checking
 			c.append("\n \n Checking URLs");
@@ -115,7 +108,7 @@ public class Helper {
 
 				try {
 					if (!alreadyChecked) {
-						urlChecker = new UrlChecker(new URL(e));
+						urlChecker = new UrlChecker(new URL(e), conn);
 					}
 					List<String> checkedLine = addLine(
 							urlChecker.getStartURL(), urlChecker.getMatches(),
