@@ -1,15 +1,13 @@
 package de.daniel.dengler.URLChecker;
 
-import java.net.MalformedURLException;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class HelperTest {
 

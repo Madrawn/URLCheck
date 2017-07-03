@@ -1,9 +1,8 @@
 package de.daniel.dengler.URLChecker;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.junit.Before;
