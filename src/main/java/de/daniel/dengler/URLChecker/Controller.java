@@ -2,17 +2,11 @@ package de.daniel.dengler.URLChecker;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
-import javax.swing.JProgressBar;
-import javax.swing.JTextArea;
 
 public class Controller implements Runnable {
 
@@ -20,7 +14,7 @@ public class Controller implements Runnable {
 	private MainWindow mainWindow;
 	private List<List<String>> workingTable = new LinkedList<List<String>>();
 	private List<String> title = new LinkedList<String>();
-	private Collection<UrlChecker> alreadyCheckedUrls = new TreeSet<UrlChecker>();
+	
 
 	public Controller(MainWindow me) {
 		this.mainWindow = me;
@@ -43,97 +37,38 @@ public class Controller implements Runnable {
 	}
 
 	public void checkTheFile() {
-		// disable the check button again
-		mainWindow.setCheckButtonEnabled(false);
 
-		JTextArea jta = mainWindow.getTextArea();
+		int relevantColumn = mainWindow.getRelevantColumn();
+		
 		// get the lines from the file
 		List<String> lines = Helper.readFile(selectedFile.getAbsolutePath());
 		
+		// disable the check button again
+		mainWindow.setCheckButtonEnabled(false);
 		
 		
-		if (lines != null && !lines.isEmpty()) {
-			String[][] table = CsvWrapper.readCsv(lines);
+		Helper.processLines(this, relevantColumn, lines);
+	}
 
-			jta.append("\n .csv-Datei erfolgreich eingelesen mit "
-					+ lines.size() + " Zeilen");
-			JProgressBar pb = mainWindow.getProgressBar();
-			pb.setMaximum(lines.size());
-			
-			//Only one column might be an error notify
-			if (table[1].length == 1) {
-				jta.append("\n \n Die CSV hat nur eine einzige Spalte. Potenziell falscher Trenner.");
-			}
-			
-			//This is definitely an error.
-			if (table[1].length < mainWindow.getRelevantColumn() +1) {
-				jta.append("\n \n Sie haben die "
-						+ (mainWindow.getRelevantColumn() +1)
-						+ ". Spalte gewählt, die Tabelle"
-						+ " hat jedoch nur "
-						+ table[1].length
-						+ " Spalte\\n\n"
-						+ "Vielleich wurde die CSV mit dem falschen Trenner exportiert?(Trenner muss ein ',' (Komma) sein.)");
-				return;
+	
+	protected List<List<String>> getWorkingTable() {
+		return workingTable;
+	}
 
-			}
+	void setProgressBarValue(int i) {
+		mainWindow.getProgressBar().setValue(i);
+	}
 
-			// We assume the file has titles in the first row. copy them to the
-			// right of the new table titles
-			String[] originalTitles = table[0];
-			for (int i = 0; i < originalTitles.length; i++) {
-				title.add(originalTitles[i]);
-			}
+	protected void setProgressMaximum(int size) {
+		mainWindow.getProgressBar().setMaximum(size);
+	}
 
-			// begin checking
-			jta.append("\n \n Checking URLs");
-			// skip titles, start at 1
-			for (int i = 1; i < table.length; i++) {
-				// check every url and generate the export table
-				String e = table[i][mainWindow.getRelevantColumn()];
-				UrlChecker urlChecker = null;
+	protected void append(String string) {
+		this.mainWindow.getTextArea().append(string);
+	}
 
-				// if we already checked then we don't need to again saving a
-				// lot of time
-				boolean alreadyChecked = false;
-				for (UrlChecker u : alreadyCheckedUrls) {
-					if (u.getStartURL().equals(e)) {
-						alreadyChecked = true;
-						urlChecker = u;
-					}
-				}
-
-				try {
-					if (!alreadyChecked) {
-						urlChecker = new UrlChecker(new URL(e));
-					}
-					List<String> checkedLine = addLine(
-							urlChecker.getStartURL(), urlChecker.getMatches(),
-							urlChecker.getNewUrl(),
-							urlChecker.getGuessedCorrectUrl(), table[i]);
-					workingTable.add(checkedLine);
-					alreadyCheckedUrls.add(urlChecker);
-					jta.append("\n" + e);
-					pb.setValue(i + 1);
-				} catch (MalformedURLException e1) {
-					jta.append("\n" + e + " ist keine korrekte URL");
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					jta.append("\n" + e + " <-> URL <-> IOException");
-
-					e1.printStackTrace();
-				}
-
-			}
-			// we have checked all the URLs enable the export button
-
-			jta.append("\n \n FINISHED! Sie können das Ergebniss jetzt exportieren.");
-			mainWindow.setExportButtonEnabled(true);
-
-		} else {
-			jta.append("\n Datei nicht richtig einlesen können. Richtige Datei gewählt?");
-
-		}
+	protected List<String> getTitle() {
+		return title;
 	}
 
 	public void export() {
@@ -167,18 +102,10 @@ public class Controller implements Runnable {
 
 	}
 
-	// helper method for generating a line as a list
-	private List<String> addLine(String startURL, boolean matches,
-			String newUrl, String guessedCorrectUrl, String[] rest) {
-		List<String> line = new LinkedList<String>();
-		line.add(startURL);
-		line.add("" + matches);
-		line.add(newUrl);
-		line.add(guessedCorrectUrl);
-		for (int i = 0; i < rest.length; i++) {
-			line.add(rest[i]);
-		}
-		return line;
+	public void setExportButtonEnabled(boolean b) {
+		mainWindow.setExportButtonEnabled(b);
 	}
+
+
 
 }

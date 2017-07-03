@@ -1,11 +1,16 @@
 package de.daniel.dengler.URLChecker;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -45,6 +50,116 @@ public class Helper {
 
 	}
 	
+	/**
+	 * @param c
+	 * @param mainWin
+	 * @param relevantColumn
+	 * @param checkedUrls
+	 * @param tableTitle
+	 * @param lines
+	 */
+	protected static void processLines(Controller c,
+			int relevantColumn, List<String> lines) {
+		
+		Collection<UrlChecker> alreadyCheckedUrls = new TreeSet<UrlChecker>();
+		
+		if (lines != null && !lines.isEmpty()) {
+			String[][] table = CsvWrapper.readCsv(lines);
+
+			c.append("\n .csv-Datei erfolgreich eingelesen mit "
+					+ lines.size() + " Zeilen");
+			c.setProgressMaximum(lines.size());
+			
+			//Only one column might be an error notify
+			if (table[1].length == 1) {
+				c.append("\n \n Die CSV hat nur eine einzige Spalte. Potenziell falscher Trenner.");
+			}
+			
+			//This is definitely an error.
+			if (table[1].length < relevantColumn +1) {
+				c.append("\n \n Sie haben die "
+						+ (relevantColumn +1)
+						+ ". Spalte gewählt, die Tabelle"
+						+ " hat jedoch nur "
+						+ table[1].length
+						+ " Spalte\\n\n"
+						+ "Vielleich wurde die CSV mit dem falschen Trenner exportiert?(Trenner muss ein ',' (Komma) sein.)");
+				return;
+
+			}
+
+			// We assume the file has titles in the first row. copy them to the
+			// right of the new table titles
+			String[] originalTitles = table[0];
+			for (int i = 0; i < originalTitles.length; i++) {
+				c.getTitle().add(originalTitles[i]);
+			}
+
+			// begin checking
+			c.append("\n \n Checking URLs");
+			// skip titles, start at 1
+			for (int i = 1; i < table.length; i++) {
+				// check every url and generate the export table
+				String e = table[i][relevantColumn];
+				UrlChecker urlChecker = null;
+
+				// if we already checked then we don't need to again saving a
+				// lot of time
+				boolean alreadyChecked = false;
+				for (UrlChecker u : alreadyCheckedUrls) {
+					if (u.getStartURL().equals(e)) {
+						alreadyChecked = true;
+						urlChecker = u;
+					}
+				}
+
+				try {
+					if (!alreadyChecked) {
+						urlChecker = new UrlChecker(new URL(e));
+					}
+					List<String> checkedLine = addLine(
+							urlChecker.getStartURL(), urlChecker.getMatches(),
+							urlChecker.getNewUrl(),
+							urlChecker.getGuessedCorrectUrl(), table[i]);
+					c.getWorkingTable().add(checkedLine);
+					alreadyCheckedUrls.add(urlChecker);
+					c.append("\n" + e);
+					c.setProgressBarValue(i + 1);
+				} catch (MalformedURLException e1) {
+					c.append("\n" + e + " ist keine korrekte URL");
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					c.append("\n" + e + " <-> URL <-> IOException");
+
+					e1.printStackTrace();
+				}
+
+			}
+			// we have checked all the URLs enable the export button
+
+			c.append("\n \n FINISHED! Sie können das Ergebniss jetzt exportieren.");
+			c.setExportButtonEnabled(true);
+
+		} else {
+			c.append("\n Datei nicht richtig einlesen können. Richtige Datei gewählt?");
+
+		}
+	}
+	
+	// helper method for generating a line as a list
+	private static List<String> addLine(String startURL, boolean matches,
+			String newUrl, String guessedCorrectUrl, String[] rest) {
+		List<String> line = new LinkedList<String>();
+		line.add(startURL);
+		line.add("" + matches);
+		line.add(newUrl);
+		line.add(guessedCorrectUrl);
+		for (int i = 0; i < rest.length; i++) {
+			line.add(rest[i]);
+		}
+		return line;
+	}
+
 
 
 }
