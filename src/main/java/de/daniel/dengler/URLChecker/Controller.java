@@ -2,6 +2,7 @@ package de.daniel.dengler.URLChecker;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,8 +16,11 @@ public class Controller implements Runnable {
 	private List<List<String>> workingTable = new LinkedList<List<String>>();
 	private List<String> title = new LinkedList<String>();
 	private Connector conn = new Connector();
-	
 
+	/**
+	 * This instantiates a Controller and adds the Title row for the table to be
+	 * @param me It's the reference to the mainwindow this controller controls
+	 */
 	public Controller(MainWindow me) {
 		this.mainWindow = me;
 		// This is the first row with the titles of each column
@@ -31,27 +35,32 @@ public class Controller implements Runnable {
 		checkTheFile();
 	}
 
+	/**
+	 * Sets the file which will be processed. A comma separated .csv file is expected. Preferably  
+	 * encoded as StandardCharsets.ISO_8859_1, but it'll work with screwed up umlauts.
+	 * @param selectedFile A comma seperated .csv file
+	 */
 	public void setFile(File selectedFile) {
 		this.selectedFile = selectedFile;
 
-
 	}
 
+	/**
+	 * Reads all relevant items from the mainWindow and starts the process of checking
+	 */
 	public void checkTheFile() {
 
 		int relevantColumn = mainWindow.getRelevantColumn();
-		
+
 		// get the lines from the file
 		List<String> lines = Helper.readFile(selectedFile.getAbsolutePath());
-		
+
 		// disable the check button again
 		mainWindow.setCheckButtonEnabled(false);
-		
-		
+
 		Helper.processLines(this, relevantColumn, lines, conn);
 	}
 
-	
 	protected List<List<String>> getWorkingTable() {
 		return workingTable;
 	}
@@ -72,6 +81,11 @@ public class Controller implements Runnable {
 		return title;
 	}
 
+	
+	/**
+	 * Exports the current workingTable as a new comma separated .csv-file.
+	 * It contains 4 columns containing the results and input table in column 5 and up
+	 */
 	public void export() {
 
 		JFileChooser jfc = new JFileChooser();
@@ -106,7 +120,5 @@ public class Controller implements Runnable {
 	public void setExportButtonEnabled(boolean b) {
 		mainWindow.setExportButtonEnabled(b);
 	}
-
-
 
 }

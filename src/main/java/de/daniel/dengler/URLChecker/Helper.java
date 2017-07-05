@@ -15,8 +15,14 @@ import java.util.TreeSet;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * 
+ * @author Madrawn
+ * Provides the main functionality not provided by the URLChecker class
+ */
 public class Helper {
 
+	
 	public static List<String> readFile(String path) {
 
 		List<String> lines;
@@ -51,6 +57,15 @@ public class Helper {
 	}
 	
 
+	/**
+	 * Here most of the interesting stuff happens.
+	 * We get the lines, extract the URLs we have to check, write the result table and manage most of the 
+	 * text output
+	 * @param c It's the controller handling the UI, it also holds the data relevant for outputting the results
+	 * @param relevantColumn The index of the column which contains the URLs we want checked.
+	 * @param lines The lines are rows of a table with the cells separated by a comma.
+	 * @param conn the Connector handling all network traffic
+	 */
 	protected static void processLines(Controller c,
 			int relevantColumn, List<String> lines, Connector conn) {
 		
@@ -107,6 +122,7 @@ public class Helper {
 				}
 
 				try {
+					
 					if (!alreadyChecked) {
 						urlChecker = new UrlChecker(new URL(e), conn);
 					}

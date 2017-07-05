@@ -12,9 +12,11 @@ public class Connector {
 
 	// this class handles connection to the internet, so I can get rid of
 	// network code in other classes
+	//its just a HTTPURLConnection wrapper
 	public Connector() {
 	}
 
+	
 	public void openConnection(URL toCheck) throws IOException {
 		con = (HttpURLConnection) toCheck.openConnection();
 	}
